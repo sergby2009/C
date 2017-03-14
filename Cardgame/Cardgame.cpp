@@ -10,15 +10,16 @@
 #define COL_GET_CARDS 5
 #define CNAME 13
 #define CTYPE 4
+#define COL_CARD_INFO 3
 
 
 void shufleCard(int [][13], int);
-bool getCardsToUser(int [][COL_CARDS][3], int, int, int* , int);
-void printUsersCard(int [][COL_CARDS][3], int, const int [][13], const char* [], const char* []);
-void printUserCard(const int [][COL_CARDS][3], int, const int[][13], const char* [], const char* []);
+bool getCardsToUser(int [][COL_CARDS][COL_CARD_INFO], int, int, int* , int);
+void printUsersCard(int [][COL_CARDS][COL_CARD_INFO], int, const int [][13], const char* [], const char* []);
+void printUserCard(const int [][COL_CARDS][COL_CARD_INFO], int, const int[][13], const char* [], const char* []);
 void findCardName(int, const char* [], const int [][13], const char* [], const char* []);
 
-bool is_coupe(int [][3], int [][CNAME]);
+bool is_coupe(int [][COL_CARD_INFO], int [][CNAME]);
 void findCardCoor(int, int*, const int [][13]);
 int findCardID(const int [][13], int, int);
 
@@ -31,7 +32,7 @@ int main()
 							{2,14,15,16,17,18,19,20,21,22,23,24,5},
 							{3,27,28,29,30,31,32,33,34,35,36,37,4},
 							{52,40,41,42,43,44,45,46,47,48,49,50,51}};
-	int cardsUser[COL_USERS][COL_CARDS][3] = { 0 };
+	int cardsUser[COL_USERS][COL_CARDS][COL_CARD_INFO] = { 0 };
 	char* cardName[13] = {"Туз","Двойка","Тройка","Четверка","Пятерка","Шестерка","Семерка","Восьмерка","Девятка","Десятка","Валет","Дама","Король"};
 	char* cardType[4] =  {"Черви","Буби","Крести","Пики"};
 	int currentCard = 1;
