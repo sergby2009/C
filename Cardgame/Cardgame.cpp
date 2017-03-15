@@ -16,12 +16,12 @@
 void shufleCard(int [][13], int);
 bool getCardsToUser(int [][COL_CARDS][COL_CARD_INFO], int, int, int* , int, int[][13]);
 void printUsersCard(int [][COL_CARDS][COL_CARD_INFO], int, const int [][13], const char* [], const char* []);
-void printUserCard(const int [][COL_CARDS][COL_CARD_INFO], int, const int[][13], const char* [], const char* []);
-void findCardName(int, const char* [], const int [][13], const char* [], const char* []);
+void printUserCard(int [][COL_CARDS][COL_CARD_INFO], int, const int[][13], const char* [], const char* []);
+void userArm_analiz(int[][COL_CARD_INFO], int[][CNAME]);
 
-bool is_coupe(int [][COL_CARD_INFO], int [][CNAME]);
+void findCardName(int, const char* [], const int [][13], const char* [], const char* []);
 void findCardCoor(int, int*, const int [][13]);
-int findCardID(const int [][13], int, int);
+int  findCardID(const int [][13], int, int);
 
 int main()
 {
@@ -112,18 +112,18 @@ void printUsersCard(int cardsUser[][COL_CARDS][COL_CARD_INFO], int countUser, co
 }
 
 /*Печать карт игрока*/
-void printUserCard(const int cardsUser[][COL_CARDS][COL_CARD_INFO], int cntUser, const int cardMap[][13], const char* cardName[], const char* cardType[])
+void printUserCard(int cardsUser[][COL_CARDS][COL_CARD_INFO], int cntUser, const int cardMap[][13], const char* cardName[], const char* cardType[])
 {
 	int cnt = 0; 
 	char* arrCard[2] = {"",""};
 	
 	
 	printf("****** Карты %d игрока ******\n",cntUser+1);
-	while (cardsUser[cntUser][cnt] != 0) 
+	while (cardsUser[cntUser][cnt][0] != 0) 
 	{
 		//findCardName(cardsUser[cntUser][cnt], (const char**)arrCard,  cardMap, cardName, cardType);
 		printf("[%d]\t", cardsUser[cntUser][cnt][0]);
-		printf("%s - %s\n", *cardType[(cardsUser[cntUser][cnt][1])], *cardName[(cardsUser[cntUser][cnt][2])]);
+		printf("%s - %s\n", cardType[(cardsUser[cntUser][cnt][1])], cardName[(cardsUser[cntUser][cnt][2])]);
 		cnt++;
 	}
 	printf("******************************\n");
@@ -145,16 +145,16 @@ void findCardName(int cardID, const char* arrCard[], const int cardMap [][13], c
 		}
 }
 
-bool is_coupe(int arr[][3], int map[][CNAME])
+void userArm_analiz(int arr[][COL_CARD_INFO], int map[][CNAME])
 {
-	int cnt = 0;
+	int currentCard = 0;
 	int arrCoord[2] = {0};
 	int result[COL_CARDS][2] = { 0 };
 	
 	/*Формирование матрицы повторений*/
-	while (arr[cnt] != 0)
+	while (arr[currentCard][0] != 0)
 	{
-		findCardCoor(arr[cnt][0], arrCoord, map);
+		findCardCoor(arr[currentCard][0], arrCoord, map);
 		for (int row = 0; row <= CTYPE-1 ; row++)
 		{
 			int item, i;
@@ -163,21 +163,20 @@ bool is_coupe(int arr[][3], int map[][CNAME])
 			i = 0;
 			while (arr[i] != 0)
 			{
-				if (i == cnt){i++;	continue;}
+				if (i == currentCard){i++;	continue;}
 				if (item == arr[i][0])
 				{
-					if (result[cnt][1] == 0) result[cnt][1]++;
-					result[cnt][0] = arrCoord[1];
-					result[cnt][1]++;
+					if (result[currentCard][1] == 0) result[currentCard][1]++;
+					result[currentCard][0] = arrCoord[1];
+					result[currentCard][1]++;
 				}
 					
 				i++;
 			}
 		}
-		cnt++;
+		currentCard++;
 	}
 	printf("stop\n");
-	return true;
 }
 
 int findCardID(const int map[][13], int row, int col)
