@@ -10,11 +10,11 @@
 #define COL_GET_CARDS 5
 #define CNAME 13
 #define CTYPE 4
-#define COL_CARD_INFO 3
+#define COL_CARD_INFO 4
 
 
 void shufleCard(int [][13], int);
-bool getCardsToUser(int [][COL_CARDS][COL_CARD_INFO], int, int, int* , int);
+bool getCardsToUser(int [][COL_CARDS][COL_CARD_INFO], int, int, int* , int, int[][13]);
 void printUsersCard(int [][COL_CARDS][COL_CARD_INFO], int, const int [][13], const char* [], const char* []);
 void printUserCard(const int [][COL_CARDS][COL_CARD_INFO], int, const int[][13], const char* [], const char* []);
 void findCardName(int, const char* [], const int [][13], const char* [], const char* []);
@@ -42,17 +42,17 @@ int main()
 	//shufleCard(cardMap, COL_CARDS);
 	
 	/*Раздача карт*/
-	if (!getCardsToUser(cardsUser, COL_USERS, COL_GET_CARDS, &currentCard, COL_CARDS)) 
+	if (!getCardsToUser(cardsUser, COL_USERS, COL_GET_CARDS, &currentCard, COL_CARDS, cardMap)) 
 		return 0;
 	
 	/*Вывод карт игроков*/
 	printUsersCard(cardsUser, COL_USERS, cardMap, (const char**)cardName, (const char**)cardType);
 
 	/*Проверка на пары*/
-	for (int i = 0; i <= COL_USERS - 1; i++)
+	/*for (int i = 0; i <= COL_USERS - 1; i++)
 	{
 		is_coupe(cardsUser[i], cardMap);
-	}
+	}*/
 	
 	system("PAUSE");
 	return 0;
@@ -62,7 +62,7 @@ int main()
 void shufleCard(int cards[][13],int count)
 {
 	int step, row, col;
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 
 	for (step = 1; step <= count; step++) 
 	{
@@ -80,23 +80,27 @@ void shufleCard(int cards[][13],int count)
 }
 
 /*Раздача карт*/
-bool getCardsToUser(int cardsUser[][COL_CARDS], int countUser, int countCards, int* currentCard, int maxCards)
+bool getCardsToUser(int cardsUser[][COL_CARDS][COL_CARD_INFO], int countUser, int countCards, int* currentCard, int maxCards, int map[][13])
 {
 	int cntUser, cntCards;
+	int arrCoord[2] = {0};
 	/*Проверка на раздачу карт больше количества карт в колоде*/
 	if ((countUser * countCards + (*currentCard-1)) > maxCards) return false;
 	
 	for (cntCards = 0; cntCards < countCards; cntCards++)
 		for (cntUser = 0; cntUser < countUser; cntUser++)
 		{
-			cardsUser[cntUser][cntCards] = *currentCard;
+			findCardCoor(*currentCard, arrCoord, map);
+			cardsUser[cntUser][cntCards][0] = *currentCard;
+			cardsUser[cntUser][cntCards][1] = arrCoord[0];
+			cardsUser[cntUser][cntCards][2] = arrCoord[1];
 			*currentCard += 1;
 		}
 	return true;
 }
 
 /*Печать карт игроков*/
-void printUsersCard(int cardsUser[][COL_CARDS], int countUser, const int cardMap[][13], const char* cardName[], const char* cardType[])
+void printUsersCard(int cardsUser[][COL_CARDS][COL_CARD_INFO], int countUser, const int cardMap[][13], const char* cardName[], const char* cardType[])
 {
 	int cnt;
 	
@@ -108,7 +112,7 @@ void printUsersCard(int cardsUser[][COL_CARDS], int countUser, const int cardMap
 }
 
 /*Печать карт игрока*/
-void printUserCard(const int cardsUser[][COL_CARDS], int cntUser, const int cardMap[][13], const char* cardName[], const char* cardType[])
+void printUserCard(const int cardsUser[][COL_CARDS][COL_CARD_INFO], int cntUser, const int cardMap[][13], const char* cardName[], const char* cardType[])
 {
 	int cnt = 0; 
 	char* arrCard[2] = {"",""};
@@ -117,9 +121,9 @@ void printUserCard(const int cardsUser[][COL_CARDS], int cntUser, const int card
 	printf("****** Карты %d игрока ******\n",cntUser+1);
 	while (cardsUser[cntUser][cnt] != 0) 
 	{
-		findCardName(cardsUser[cntUser][cnt], (const char**)arrCard,  cardMap, cardName, cardType);
-		printf("[%d]\t", cardsUser[cntUser][cnt]);
-		printf("%s - %s\n",arrCard[0], arrCard[1]);
+		//findCardName(cardsUser[cntUser][cnt], (const char**)arrCard,  cardMap, cardName, cardType);
+		printf("[%d]\t", cardsUser[cntUser][cnt][0]);
+		printf("%s - %s\n", *cardType[(cardsUser[cntUser][cnt][1])], *cardName[(cardsUser[cntUser][cnt][2])]);
 		cnt++;
 	}
 	printf("******************************\n");
