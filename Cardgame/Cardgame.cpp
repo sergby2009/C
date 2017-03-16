@@ -149,10 +149,12 @@ void userArm_analiz(int arr[][COL_CARD_INFO], int map[][CNAME])
 {
 	int currentCard = 0;
 	int arrCoord[2] = {0};
-	int result[COL_CARDS][2] = { 0 };
+	//int result[COL_CARDS][2] = { 0 };
 	
 	/*Формирование матрицы повторений*/
-	while (arr[currentCard][0] != 0)
+
+
+	/*while (arr[currentCard][0] != 0)
 	{
 		findCardCoor(arr[currentCard][0], arrCoord, map);
 		for (int row = 0; row <= CTYPE-1 ; row++)
@@ -175,7 +177,7 @@ void userArm_analiz(int arr[][COL_CARD_INFO], int map[][CNAME])
 			}
 		}
 		currentCard++;
-	}
+	}*/
 	printf("stop\n");
 }
 
