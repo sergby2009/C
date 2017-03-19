@@ -91,7 +91,6 @@ int main()
 	while (getCountGamerToGame(game) > 1 || getMaxMoneyGamerOfProcent(game) > PROCENT_WIN)
 	{
 		break;
-		printf;
 	}
 			
 	/*Анализ карт игроков*/
