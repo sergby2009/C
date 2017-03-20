@@ -29,8 +29,11 @@ bool getResult_TypeCardIncrease(int tempArr[COL_CARDS][COL_CARD_INFO], int resul
 bool getResult_RoyalCardIncrease(int tempArr[COL_CARDS][COL_CARD_INFO], int resultArr[]);
 int getResult_MaxCard(int arr[COL_CARDS][COL_CARD_INFO]);
 
-int getCountGamerToGame(int arr[COL_USERS][2]);
-int getMaxMoneyGamerOfProcent(int arr[COL_USERS][2]);
+
+void setEmptyRole(int arr[COL_USERS][3]);
+void setGamerRole(int arrGame[COL_USERS][3],int user);
+int getCountGamerToGame(int arrGame[COL_USERS][3]);
+int getMaxMoneyGamerOfProcent(int arrGame[COL_USERS][3]);
 
 void findCardName(int, const char* [], const int [][13], const char* [], const char* []);
 void findCardCoor(int, int*, const int [][13]);
@@ -64,9 +67,9 @@ int main()
 	/*Указатель на номер первой карты в колоде*/
 	int currentCard = 1;
 	/*Указатель на ходящего игрока*/
-	int currentGamer = 0;
+	int currentGameBroker = 0;
 	/*Игровой массив*/
-	int game[COL_USERS][2];
+	int game[COL_USERS][3] = {0};
 
 
 	/*Перетасовка карт*/
@@ -80,13 +83,17 @@ int main()
 	printUsersCard(cardsUser, COL_USERS, cardMap, (const char**)cardName, (const char**)cardType);
 	
 	/*Старт игры*/
-	currentGamer = rand() % 6;
+	
+	currentGameBroker = rand() % 6;
+
 	for (int i = 0; i < COL_USERS; i++)
 	{
 		game[i][0] = 1;
 		game[i][1] = COL_MONEY;
 	}
-
+	
+	/*Раздача ролей игроков*/
+	setGamerRole(game, currentGameBroker);
 	
 	while (getCountGamerToGame(game) > 1 || getMaxMoneyGamerOfProcent(game) > PROCENT_WIN)
 	{
@@ -583,7 +590,7 @@ void findCardCoor(int cardID, int *arrCard, const int map[][13])
 		}
 }
 
-int getCountGamerToGame(int arr[COL_USERS][2])
+int getCountGamerToGame(int arr[COL_USERS][3])
 {
 	int sum = 0;
 	for (int i = 0; i < COL_USERS; i++)
@@ -591,7 +598,7 @@ int getCountGamerToGame(int arr[COL_USERS][2])
 	return sum;
 }
 
-int getMaxMoneyGamerOfProcent(int arr[COL_USERS][2])
+int getMaxMoneyGamerOfProcent(int arr[COL_USERS][3])
 {
 	float maxMoney = COL_USERS * COL_MONEY;
 	float percentMoney = 0;
@@ -603,4 +610,26 @@ int getMaxMoneyGamerOfProcent(int arr[COL_USERS][2])
 			tmp = (int)percentMoney;
 	}
 	return tmp;
+}
+
+void setGamerRole(int arrGame[COL_USERS][3], int user)
+{
+	setEmptyRole(arrGame);
+
+	arrGame[user][3] = 1;
+	if (user + 1 < COL_USERS)
+		arrGame[user + 1][3] = 2;
+	else
+		arrGame[(user + 1) - COL_USERS][3] = 2;
+
+	if (user + 2 < COL_USERS)
+		arrGame[user + 2][3] = 3;
+	else
+		arrGame[(user + 2) - COL_USERS][3] = 3;
+}
+
+void setEmptyRole(int arr[COL_USERS][3])
+{
+	for(int i = 0; i < COL_USERS; i++)
+		arr[i][3] = 0;
 }
