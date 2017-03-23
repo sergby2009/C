@@ -16,6 +16,8 @@
 #define COL_MONEY 100
 #define PROCENT_WIN 80
 
+#define SMALL_BLIND 0.5
+#define BIG_BLIND 1.0
 
 void shufleCard(int [][13], int);
 bool getCardsToUser(int [][COL_CARDS][COL_CARD_INFO], int, int, int* , int, int[][13]);
@@ -30,10 +32,12 @@ bool getResult_RoyalCardIncrease(int tempArr[COL_CARDS][COL_CARD_INFO], int resu
 int getResult_MaxCard(int arr[COL_CARDS][COL_CARD_INFO]);
 
 
-void setEmptyRole(int arr[COL_USERS][3]);
-void setGamerRole(int arrGame[COL_USERS][3],int user);
-int getCountGamerToGame(int arrGame[COL_USERS][3]);
-int getMaxMoneyGamerOfProcent(int arrGame[COL_USERS][3]);
+void setEmptyRole(double arr[COL_USERS][3]);
+void setGamerRole(double arrGame[COL_USERS][3],int user);
+int getCountGamerToGame(double arrGame[COL_USERS][3]);
+int getMaxMoneyGamerOfProcent(double arrGame[COL_USERS][3]);
+
+void GameProcess(int coloda[4][13], const char* cardType[], const char* cardName[], double game[COL_USERS][3], int cards[COL_USERS][COL_CARDS][COL_CARD_INFO], int userArm[COL_USERS][2], int *currentGameBroker, int *currentCard);
 
 void findCardName(int, const char* [], const int [][13], const char* [], const char* []);
 void findCardCoor(int, int*, const int [][13]);
@@ -66,40 +70,39 @@ int main()
 	char* cardType[4] =  {"Черви","Буби","Крести","Пики"};
 	/*Указатель на номер первой карты в колоде*/
 	int currentCard = 1;
-	/*Указатель на ходящего игрока*/
+	/*Указатель на текущего брокера*/
 	int currentGameBroker = 0;
 	/*Игровой массив*/
-	int game[COL_USERS][3] = {0};
+	double gameArray[COL_USERS][3] = {0};
 
-
-	/*Перетасовка карт*/
-	shufleCard(cardMap, COL_CARDS);
-	
-	/*Раздача карт*/
-	if (!getCardsToUser(cardsUser, COL_USERS, COL_GET_CARDS, &currentCard, COL_CARDS, cardMap)) 
-		return 0;
-	
-	/*Вывод карт игроков*/
-	printUsersCard(cardsUser, COL_USERS, cardMap, (const char**)cardName, (const char**)cardType);
 	
 	/*Старт игры*/
-	
+	srand((unsigned int)time(NULL));
 	currentGameBroker = rand() % 6;
 
+	/*Инициализация игроков*/
 	for (int i = 0; i < COL_USERS; i++)
 	{
-		game[i][0] = 1;
-		game[i][1] = COL_MONEY;
+		gameArray[i][0] = 1;
+		gameArray[i][1] = COL_MONEY;
 	}
 	
-	/*Раздача ролей игроков*/
-	setGamerRole(game, currentGameBroker);
-	
-	while (getCountGamerToGame(game) > 1 || getMaxMoneyGamerOfProcent(game) > PROCENT_WIN)
+	while (getCountGamerToGame(gameArray) > 1 || getMaxMoneyGamerOfProcent(gameArray) > PROCENT_WIN)
 	{
+		/*Перетасовка карт*/
+		shufleCard(cardMap, COL_CARDS);
+		/*Раздача ролей игроков*/
+		setGamerRole(gameArray, currentGameBroker);
+		/*Раздача карт*/
+		if (!getCardsToUser(cardsUser, COL_USERS, COL_GET_CARDS, &currentCard, COL_CARDS, cardMap)) return 0;
+		/*Игровой процесс*/
+		GameProcess(cardMap, (const char**)cardType, (const char**)cardName, gameArray, cardsUser, cardsUserArm, &currentGameBroker, &currentCard);
 		break;
 	}
-			
+
+	/*Вывод карт игроков*/
+	//printUsersCard(cardsUser, COL_USERS, cardMap, (const char**)cardName, (const char**)cardType);
+
 	/*Анализ карт игроков*/
 	//for (int i = 0; i <= COL_USERS - 1; i++)
 	//{
@@ -122,7 +125,7 @@ int main()
 void shufleCard(int cards[][13],int count)
 {
 	int step, row, col;
-	srand((unsigned int)time(NULL));
+	//srand((unsigned int)time(NULL));
 
 	for (step = 1; step <= count; step++) 
 	{
@@ -590,7 +593,7 @@ void findCardCoor(int cardID, int *arrCard, const int map[][13])
 		}
 }
 
-int getCountGamerToGame(int arr[COL_USERS][3])
+int getCountGamerToGame(double arr[COL_USERS][3])
 {
 	int sum = 0;
 	for (int i = 0; i < COL_USERS; i++)
@@ -598,10 +601,10 @@ int getCountGamerToGame(int arr[COL_USERS][3])
 	return sum;
 }
 
-int getMaxMoneyGamerOfProcent(int arr[COL_USERS][3])
+int getMaxMoneyGamerOfProcent(double arr[COL_USERS][3])
 {
-	float maxMoney = COL_USERS * COL_MONEY;
-	float percentMoney = 0;
+	double maxMoney = COL_USERS * COL_MONEY;
+	double percentMoney = 0;
 	int tmp = 0;
 	for (int i = 0; i < COL_USERS; i++)
 	{
@@ -612,24 +615,81 @@ int getMaxMoneyGamerOfProcent(int arr[COL_USERS][3])
 	return tmp;
 }
 
-void setGamerRole(int arrGame[COL_USERS][3], int user)
+void setGamerRole(double arrGame[COL_USERS][3], int user)
 {
 	setEmptyRole(arrGame);
 
-	arrGame[user][3] = 1;
-	if (user + 1 < COL_USERS)
-		arrGame[user + 1][3] = 2;
+	arrGame[user][2] = 1;
+	if (user + 1 < COL_USERS - 1)
+		arrGame[user + 1][2] = 2;
 	else
-		arrGame[(user + 1) - COL_USERS][3] = 2;
+		arrGame[(user + 1) - (COL_USERS)][2] = 2;
 
-	if (user + 2 < COL_USERS)
-		arrGame[user + 2][3] = 3;
+	if (user + 2 < COL_USERS - 1)
+		arrGame[user + 2][2] = 3;
 	else
-		arrGame[(user + 2) - COL_USERS][3] = 3;
+		arrGame[(user + 2) - (COL_USERS)][2] = 3;
 }
 
-void setEmptyRole(int arr[COL_USERS][3])
+void setEmptyRole(double arr[COL_USERS][3])
 {
 	for(int i = 0; i < COL_USERS; i++)
-		arr[i][3] = 0;
+		arr[i][2] = 0;
+}
+
+int nextGamer(int cnt, double arr[COL_USERS][3])
+{
+	bool result = false;
+	int initCnt = cnt;
+	while (!result)
+	{
+		if (cnt + 1 < COL_USERS - 1)
+			cnt++;
+		else
+			cnt = (cnt + 1) - COL_USERS;
+		if (arr[cnt][0] == 1)
+			if (cnt != initCnt)
+				result = true;
+			else
+				return -1;
+	}
+	return cnt;
+}
+
+double setSmollBlinde(double gameArray[])
+{
+	double sblind = SMALL_BLIND;
+	gameArray[1] -= SMALL_BLIND;
+	return sblind;
+}
+
+double setBigBlinde(double gameArray[])
+{
+	double bblind = BIG_BLIND;
+	gameArray[1] -= BIG_BLIND;
+	return bblind;
+}
+
+void GameProcess(int coloda[4][13], const char* cardType[], const char* cardName[], double game[COL_USERS][3], int cards[COL_USERS][COL_CARDS][COL_CARD_INFO], int userArm[COL_USERS][2], int *currentGameBroker, int *currentCard)
+{
+	/*Инициализация банка*/
+	double bank = 0;
+	/*Указатель на ходящего игрока*/
+	int currentGamer = *currentGameBroker;
+	/*Переход хода малому Блайнду*/
+	currentGamer = nextGamer(currentGamer,game);
+	/*Оплата малого блайнда*/
+	bank += setSmollBlinde(game[currentGamer]);
+	/*Переход хода большому Блайнду*/
+	currentGamer = nextGamer(currentGamer, game);
+	/*Оплата малого блайнда*/
+	bank += setBigBlinde(game[currentGamer]);
+	/*Переход хода*/
+	currentGamer = nextGamer(currentGamer, game);
+	/*Определение руки игрока*/
+	userArm_analiz(cards[currentGamer], userArm[currentGamer]);
+	/*Печать руки игрока*/
+	printf("%s\nИгрок %d\n", "********************", currentGamer + 1);
+	printf("Рука:%d\tОчки:%d\n%s\n", userArm[currentGamer][0], userArm[currentGamer][1], "********************");
+
 }
